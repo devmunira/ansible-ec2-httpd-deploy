@@ -1,0 +1,59 @@
+hosts: localhost
+vars_files:
+  - ../variables/aws_ec2_variables.yaml
+  - ../variables/aws_ec2_secrets.yaml
+variables:
+  packages:
+    - boto3
+    - botocore
+tasks:
+  - name: "Install python"
+    package:
+      name: python3
+      state: present
+
+  - name: "Install pip"
+    package:
+      name: python3-pip
+      state: present
+
+  - name: "Install packages"
+    pip:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ packages }}"
+
+  - name: "Create EC2 instance"
+    amazon.aws.ec2_instance:
+      access_key: "{{ aws_access_key }}"
+      secret_key: "{{ aws_secret_key }}"
+      region: "{{ region }}"
+      name: "{{ name }}"
+      instance_type: "{{ instance_type }}"
+      image_id: "{{ image_id }}"
+      key_name: "{{ key_name }}"
+      vpc_subnet_id: "{{ vpc_subnet_id }}"
+      security_group: "{{ security_group }}"
+      count: 3
+      state: present
+      wait: true
+      wait_timeout: 300
+      tags:
+        Name: "{{ name }}"
+    register: ec2_instance
+
+    - debug:
+        var: ec2_instance
+
+    - set_fact:
+        ec2_ips: "{{myec2.instances | map(attribute='private_ip_address') | list }}"
+
+    - debug:
+        var: ec2_ips
+
+    - name: "Copy and Update inventory file"
+      template:
+        src: "inventory/inventory.j2"
+        dest: "inventory/inventory"
+        mode: "0644"
+        
