@@ -20,16 +20,18 @@ This project automates the deployment of an EC2 instance on AWS and installs an 
 
 ### 2. Directory Structure
 
+```text
 ansible-ec2-httpd-deploy/
 ├── ansible.cfg
 ├── inventory/
-│ └── aws_ec2.yaml
+│   └── aws_ec2.yaml
 ├── playbooks/
-│ ├── create_ec2.yaml
-│ └── setup_httpd.yaml
-├── vars/
-│ └── aws_ec2_variables.yaml
-├── app/
-│ └── index.html
-├── roles/ (optional, for scaling later)
+│   ├── create_ec2.yaml
+│   └── setup_httpd.yaml
+├── group_vars/
+│   └── all.yaml
+├── files/
+│   └── index.html
+├── roles/                # (optional, for future use)
 ├── README.md
+```
